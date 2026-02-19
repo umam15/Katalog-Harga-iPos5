@@ -1,0 +1,47 @@
+/* style.css */
+:root {
+    --primary: #2c3e50;
+    --accent: #3498db;
+    --bg: #f4f4f4;
+    --text: #333;
+}
+
+body { font-family: monospace, sans-serif; margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+header { background: var(--primary); color: #fff; padding: 10px 20px; }
+h1 { margin: 0; font-size: 1.2rem; }
+
+/* Filter Section */
+.filters { background: #fff; padding: 15px; border-bottom: 1px solid #ddd; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.filters input, .filters select { padding: 5px; border: 1px solid #ccc; }
+.filters button { background: var(--accent); color: white; border: none; padding: 6px 12px; cursor: pointer; }
+
+/* Stock Indicators */
+.stok-ok { color: green; font-weight: bold; font-size: 1.2em; }
+.stok-no { color: red; font-weight: bold; font-size: 1.2em; }
+
+/* Pagination */
+.pagination { padding: 20px; text-align: center; }
+.pagination a { text-decoration: none; padding: 5px 10px; border: 1px solid #ccc; background: white; color: var(--text); margin: 0 2px; }
+.pagination a.active { background: var(--accent); color: white; }
+
+/* --- DESKTOP VIEW (Table) --- */
+.desktop-view { display: block; width: 100%; overflow-x: auto; padding: 20px; box-sizing: border-box; }
+table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+th { background: #eee; font-weight: bold; }
+.mobile-view { display: none; }
+
+/* --- MOBILE VIEW (Cards) --- */
+@media (max-width: 768px) {
+    .desktop-view { display: none; }
+    .mobile-view { display: block; padding: 10px; }
+    
+    .card { background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; }
+    .card-title { font-weight: bold; font-size: 1.1em; color: var(--primary); }
+    .card-price { color: var(--accent); font-weight: bold; font-size: 1.2em; }
+    .card-row { display: flex; justify-content: space-between; margin: 4px 0; font-size: 0.85em; }
+    .card-label { color: #777; }
+    
+    .filters { flex-direction: column; align-items: stretch; }
+}
