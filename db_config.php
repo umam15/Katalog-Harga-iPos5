@@ -1,16 +1,17 @@
 <?php
 // db_config.php
+$host = 'ipos5.domainku.com';
+$port = '5444';
+$db   = 'i5_1Ramadhan2026';
+$user = 'sysi5adm';
+$pass = '*****';
 
-$host = "ipos5.domainku.com";       // atau alamat ip
-$port = "5444";
-$dbname = "i5_1Ramadhan2026";       // nama database diawali i5_
-$user = "sysi5adm";
-$password = "*****";
-
-$conn_string = "host={$host} port={$port} dbname={$dbname} user={$user} password={$password}";
-$dbconn = pg_connect($conn_string);
-
-if (!$dbconn) {
-    die("Koneksi Error: " . pg_last_error());
+try {
+    $dsn = "pgsql:host=$host;port=$port;dbname=$db";
+    $pdo = new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+} catch (PDOException $e) {
+    die("Koneksi gagal: " . $e->getMessage());
 }
-?>
