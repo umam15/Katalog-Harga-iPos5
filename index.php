@@ -68,7 +68,6 @@ $sql = "SELECT i.namaitem, i.jenis, i.merek, i.sistemhargajual, i.keterangan,
 
 $stmt = $pdo->prepare($sql);
 
-// Bind params untuk limit & offset secara manual karena harus integer
 foreach ($params as $key => $val) {
     $stmt->bindValue($key, $val);
 }
@@ -90,7 +89,8 @@ function formatRow($row) {
     return [
         'barcode' => $row['kodebarcode'],
         'nama'    => $row['namaitem'],
-        'info'    => $row['jenis'] . " / " . $row['merek'],
+        'jenis'   => $row['jenis'],
+        'merek'   => $row['merek'],
         'satuan'  => $satuan,
         'harga'   => number_format((float)$harga, 0, ',', '.'),
         'stok'    => ((float)$row['stok'] > 0) ? '<span class="stok-ok">+</span>' : '<span class="stok-no">x</span>',
@@ -124,14 +124,14 @@ $base_pagination_url = "?" . http_build_query($query_params) . "&page=";
     <select name="jenis">
         <option value="">-- Jenis --</option>
         <?php foreach($res_jenis as $rj): ?>
-            <option value="<?= $rj['jenis'] ?>" <?= ($f_jenis == $rj['jenis']) ? 'selected' : '' ?>><?= $rj['jenis'] ?></option>
+            <option value="<?= htmlspecialchars($rj['jenis']) ?>" <?= ($f_jenis == $rj['jenis']) ? 'selected' : '' ?>><?= htmlspecialchars($rj['jenis']) ?></option>
         <?php endforeach; ?>
     </select>
 
     <select name="merek">
         <option value="">-- Merek --</option>
         <?php foreach($res_merek as $rm): ?>
-            <option value="<?= $rm['merek'] ?>" <?= ($f_merek == $rm['merek']) ? 'selected' : '' ?>><?= $rm['merek'] ?></option>
+            <option value="<?= htmlspecialchars($rm['merek']) ?>" <?= ($f_merek == $rm['merek']) ? 'selected' : '' ?>><?= htmlspecialchars($rm['merek']) ?></option>
         <?php endforeach; ?>
     </select>
 
@@ -141,7 +141,7 @@ $base_pagination_url = "?" . http_build_query($query_params) . "&page=";
 
     <button type="submit">Cari</button>
     <?php if($search || $f_jenis || $f_merek || $f_stok): ?>
-        <a href="index.php" style="color:red; font-size:0.8rem; text-decoration:none; margin-left:5px;">Reset</a>
+        <a href="index.php" style="color:var(--danger, red); font-size:0.8rem; text-decoration:none; margin-left:5px;">Reset</a>
     <?php endif; ?>
 </form>
 
@@ -152,12 +152,10 @@ $base_pagination_url = "?" . http_build_query($query_params) . "&page=";
                 <tr>
                     <th>Barcode</th>
                     <th>Nama Item</th>
-                    <th>Jenis/Merek</th>
-                    <th>Satuan</th>
+                    <th>Jenis</th>
                     <th>Harga</th>
-                    <th>Stok</th>
-                    <th>Keterangan</th>
-                    <th>System</th>
+                    <th style="text-align:center;">Stok</th>
+                    <th>Sistem</th>
                 </tr>
             </thead>
             <tbody>
@@ -165,17 +163,26 @@ $base_pagination_url = "?" . http_build_query($query_params) . "&page=";
                     <?php foreach ($results as $raw): $d = formatRow($raw); ?>
                     <tr>
                         <td style="font-family:monospace;"><?= htmlspecialchars($d['barcode']) ?></td>
-                        <td><strong><?= htmlspecialchars($d['nama']) ?></strong></td>
-                        <td><?= htmlspecialchars($d['info']) ?></td>
-                        <td><?= htmlspecialchars($d['satuan']) ?></td>
-                        <td style="color:blue; font-weight:700;">Rp <?= $d['harga'] ?></td>
-                        <td><?= $d['stok'] ?></td>
-                        <td><?= htmlspecialchars($d['ket']) ?></td>
-                        <td><span style="background:#eee; padding:2px 5px; border-radius:4px; font-size:0.7rem;"><?= $d['sys'] ?></span></td>
+                        <td>
+                            <strong><?= htmlspecialchars($d['nama']) ?></strong>
+                            <?php if (!empty($d['ket'])): ?>
+                                <br><small style="color:var(--text-muted, gray);"><?= htmlspecialchars($d['ket']) ?></small>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                        	<?= htmlspecialchars($d['jenis']) ?>
+                        	<br><small style="color:var(--text-muted, gray);"><?= htmlspecialchars($d['merek']) ?></small>
+                        </td>
+                        <td>
+                            <span style="color:var(--primary, blue); font-weight:700;">Rp <?= $d['harga'] ?></span>
+                            <br><small style="color:var(--text-muted, gray);"><?= htmlspecialchars($d['satuan']) ?></small>
+                        </td>
+                        <td style="text-align:center;"><?= $d['stok'] ?></td>
+                        <td><span style="background:#f1f5f9; padding:2px 5px; border-radius:4px; font-size:0.7rem;"><?= $d['sys'] ?></span></td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="8" style="text-align:center; padding:3rem;">Data tidak ditemukan.</td></tr>
+                    <tr><td colspan="7" style="text-align:center; padding:3rem;">Data tidak ditemukan.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -189,16 +196,27 @@ $base_pagination_url = "?" . http_build_query($query_params) . "&page=";
             <div class="card-header" style="display:flex; justify-content: space-between;">
                 <div>
                     <div style="font-size: 0.7rem; color: gray;"><?= htmlspecialchars($d['barcode']) ?></div>
-                    <div style="font-weight: bold;"><?= htmlspecialchars($d['nama']) ?></div>
+                    <div style="font-weight: bold; line-height:1.2;"><?= htmlspecialchars($d['nama']) ?></div>
                 </div>
                 <?= $d['stok'] ?>
             </div>
-            <div style="margin-top: 10px; display: flex; justify-content: space-between;">
-                <span>Harga</span>
-                <span style="font-weight: bold; color: blue;">Rp <?= $d['harga'] ?> <small style="color:gray;">/ <?= htmlspecialchars($d['satuan']) ?></small></span>
+            
+            <?php if (!empty($d['ket'])): ?>
+                <div style="font-size: 0.8rem; color: gray; margin-bottom: 8px;">
+                    Ket: <?= htmlspecialchars($d['ket']) ?>
+                </div>
+            <?php endif; ?>
+
+            <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items:center;">
+                <span style="font-size: 0.85rem; color:gray;">
+                    <?= htmlspecialchars($d['jenis']) ?> &bull; <?= htmlspecialchars($d['merek']) ?>
+                </span>
+                <span style="font-weight: bold; color: var(--primary, blue);">
+                    Rp <?= $d['harga'] ?> <small style="color:gray; font-weight:normal;">/ <?= htmlspecialchars($d['satuan']) ?></small>
+                </span>
             </div>
-            <div style="font-size: 0.8rem; border-top: 1px solid #eee; margin-top: 5px; padding-top: 5px;">
-                System: <?= $d['sys'] ?>
+            <div style="font-size: 0.8rem; border-top: 1px solid #eee; margin-top: 8px; padding-top: 8px;">
+                System: <span style="background:#f1f5f9; padding:1px 5px; border-radius:3px;"><?= $d['sys'] ?></span>
             </div>
         </div>
         <?php endforeach; ?>
@@ -210,19 +228,19 @@ $base_pagination_url = "?" . http_build_query($query_params) . "&page=";
 <?php if ($total_pages > 1): ?>
 <div class="pagination" style="display: flex; gap: 5px; justify-content: center; margin: 20px 0;">
     <?php if ($page > 1): ?>
-        <a href="<?= $base_pagination_url ?>1" style="padding: 5px 10px; border: 1px solid #ddd; text-decoration: none;">&laquo;</a>
+        <a href="<?= $base_pagination_url ?>1" style="padding: 5px 10px; border: 1px solid #ddd; text-decoration: none; border-radius:4px;">&laquo;</a>
     <?php endif; ?>
 
     <?php
     $start = max(1, $page - 2);
     $end = min($total_pages, $page + 2);
     for ($i = $start; $i <= $end; $i++): ?>
-        <a href="<?= $base_pagination_url . $i ?>" style="padding: 5px 10px; border: 1px solid #ddd; text-decoration: none; <?= ($page == $i) ? 'background: #007bff; color: white;' : '' ?>"><?= $i ?></a>
+        <a href="<?= $base_pagination_url . $i ?>" style="padding: 5px 10px; border: 1px solid #ddd; text-decoration: none; border-radius:4px; <?= ($page == $i) ? 'background: #2563eb; color: white; border-color: #2563eb;' : 'color:#333;' ?>"><?= $i ?></a>
     <?php endfor; ?>
 
     <?php if ($page < $total_pages): ?>
-        <a href="<?= $base_pagination_url . ($page + 1) ?>" style="padding: 5px 10px; border: 1px solid #ddd; text-decoration: none;">Next</a>
-        <a href="<?= $base_pagination_url . $total_pages ?>" style="padding: 5px 10px; border: 1px solid #ddd; text-decoration: none;">&raquo;</a>
+        <a href="<?= $base_pagination_url . ($page + 1) ?>" style="padding: 5px 10px; border: 1px solid #ddd; text-decoration: none; border-radius:4px; color:#333;">Next</a>
+        <a href="<?= $base_pagination_url . $total_pages ?>" style="padding: 5px 10px; border: 1px solid #ddd; text-decoration: none; border-radius:4px; color:#333;">&raquo;</a>
     <?php endif; ?>
 </div>
 <?php endif; ?>
