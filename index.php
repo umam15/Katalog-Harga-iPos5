@@ -202,7 +202,7 @@ $base_pagination_url = "?" . http_build_query($query_params) . "&page=";
             </div>
             
             <?php if (!empty($d['ket'])): ?>
-                <div style="font-size: 0.8rem; color: gray; margin-bottom: 8px;">
+                <div class="text-wrap" style="font-size: 0.8rem; color: gray; margin-bottom: 8px;">
                     Ket: <?= htmlspecialchars($d['ket']) ?>
                 </div>
             <?php endif; ?>
