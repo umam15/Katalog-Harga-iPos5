@@ -42,6 +42,10 @@ th { background: #eee; font-weight: bold; }
     .card-price { color: var(--accent); font-weight: bold; font-size: 1.2em; }
     .card-row { display: flex; justify-content: space-between; margin: 4px 0; font-size: 0.85em; }
     .card-label { color: #777; }
-    
+    .text-wrap {
+        word-break: break-word;   /* Pecah kata jika terlalu panjang */
+        overflow-wrap: break-word;
+        white-space: normal;      /* Izinkan pindah baris */
+    }
     .filters { flex-direction: column; align-items: stretch; }
 }
